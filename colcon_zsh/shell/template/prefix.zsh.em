@@ -14,9 +14,7 @@ colcon_prefix_source_zsh_script() {
     fi
     . "$_colcon_prefix_source_zsh_script"
   else
-    if [ -n "$COLCON_TRACE" ]; then
-      echo "not found: \"$_colcon_prefix_source_zsh_script\""
-    fi
+    echo "not found: \"$_colcon_prefix_source_zsh_script\"" 1>&2
   fi
 
   unset _colcon_prefix_source_zsh_script
