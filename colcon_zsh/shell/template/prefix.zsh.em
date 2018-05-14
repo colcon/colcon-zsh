@@ -10,6 +10,16 @@ else
   _colcon_prefix_zsh_COLCON_CURRENT_PREFIX="$COLCON_CURRENT_PREFIX"
 fi
 
+# function to convert array-like strings into arrays
+# to workaround SH_WORD_SPLIT not being set
+_colcon_prefix_zsh_convert_to_array() {
+  local _listname=$1
+  local _dollar="$"
+  local _split="{="
+  local _to_array="(\"$_dollar$_split$_listname}\")"
+  eval $_listname=$_to_array
+}
+
 # function to prepend a value to a variable
 # which uses colons as separators
 # duplicates as well as trailing separators are avoided
@@ -27,6 +37,8 @@ _colcon_prefix_zsh_prepend_unique_value() {
   IFS=":"
   # start with the new value
   _all_values="$_value"
+  # workaround SH_WORD_SPLIT not being set
+  _colcon_prefix_zsh_convert_to_array _values
   # iterate over existing values in the variable
   for _item in $_values; do
     # ignore empty strings
@@ -56,6 +68,7 @@ _colcon_prefix_zsh_prepend_unique_value() {
 # add this prefix to the COLCON_PREFIX_PATH
 _colcon_prefix_zsh_prepend_unique_value COLCON_PREFIX_PATH "$_colcon_prefix_zsh_COLCON_CURRENT_PREFIX"
 unset _colcon_prefix_zsh_prepend_unique_value
+unset _colcon_prefix_zsh_convert_to_array
 @[if pkg_names]@
 
 # function to source another script with conditional trace output
