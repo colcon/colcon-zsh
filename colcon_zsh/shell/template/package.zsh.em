@@ -24,8 +24,19 @@ _colcon_package_zsh_source_script() {
   fi
 }
 
+# function to convert array-like strings into arrays
+# to workaround SH_WORD_SPLIT not being set
+colcon_zsh_convert_to_array() {
+  local _listname=$1
+  local _dollar="$"
+  local _split="{="
+  local _to_array="(\"$_dollar$_split$_listname}\")"
+  eval $_listname=$_to_array
+}
+
 # source sh script of this package
 _colcon_package_zsh_source_script "$_colcon_package_zsh_COLCON_CURRENT_PREFIX/share/@(pkg_name)/package.sh"
+unset convert_zsh_to_array
 @[if hooks]@
 
 # setting COLCON_CURRENT_PREFIX avoids determining the prefix in the sourced scripts
