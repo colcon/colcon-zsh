@@ -18,7 +18,7 @@ _colcon_package_zsh_source_script() {
     if [ -n "$COLCON_TRACE" ]; then
       echo ". \"$1\""
     fi
-    . $@@
+    . "$@@"
   else
     echo "not found: \"$1\"" 1>&2
   fi
