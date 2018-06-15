@@ -69,7 +69,23 @@ _colcon_prefix_zsh_prepend_unique_value() {
 _colcon_prefix_zsh_prepend_unique_value COLCON_PREFIX_PATH "$_colcon_prefix_zsh_COLCON_CURRENT_PREFIX"
 unset _colcon_prefix_zsh_prepend_unique_value
 unset _colcon_prefix_zsh_convert_to_array
-@[if pkg_names]@
+
+# use the Python executable known at configure time
+_colcon_python_executable="@(python_executable)"
+# allow overriding it with a custom location
+if [ -n "$COLCON_PYTHON_EXECUTABLE" ]; then
+  _colcon_python_executable="$COLCON_PYTHON_EXECUTABLE"
+fi
+# if the Python executable doesn't exist try another fall back
+if [ ! -f "$_colcon_python_executable" ]; then
+  if /usr/bin/env python3 --version > /dev/null
+  then
+    _colcon_python_executable=`/usr/bin/env python3 -c "import sys; print(sys.executable)"`
+  else
+    echo "error: unable to find fallback python3 executable"
+    return 1
+  fi
+fi
 
 # function to source another script with conditional trace output
 # first argument: the path of the script
@@ -84,15 +100,25 @@ _colcon_prefix_zsh_source_script() {
   fi
 }
 
-# source packages
-@[  for pkg_name in pkg_names]@
-# setting COLCON_CURRENT_PREFIX avoids determining the prefix in the sourced script
-COLCON_CURRENT_PREFIX=$_colcon_prefix_zsh_COLCON_CURRENT_PREFIX@('' if merge_install else ('/' + pkg_name))
-_colcon_prefix_zsh_source_script "$COLCON_CURRENT_PREFIX/share/@(pkg_name)/@(package_script_no_ext).zsh"
-
-@[  end for]@
-unset COLCON_CURRENT_PREFIX
-unset _colcon_prefix_zsh_source_script
+# get all packages in topological order
+_colcon_ordered_packages="$(@
+$_colcon_python_executable "$_colcon_prefix_zsh_COLCON_CURRENT_PREFIX/_local_setup_util.py"@
+@[if merge_install]@
+ --merged-install@
 @[end if]@
+)"
+unset _colcon_python_executable
+_colcon_prefix_zsh_convert_to_array _colcon_ordered_packages
 
+# source package specific scripts in topological order
+for _colcon_package_name in $_colcon_ordered_packages; do
+  # setting COLCON_CURRENT_PREFIX avoids relying on the build time prefix of the sourced script
+  COLCON_CURRENT_PREFIX="${_colcon_prefix_zsh_COLCON_CURRENT_PREFIX}@('' if merge_install else '/${_colcon_package_name}')"
+  _colcon_prefix_zsh_source_script "$COLCON_CURRENT_PREFIX/share/${_colcon_package_name}/@(package_script_no_ext).zsh"
+done
+unset _colcon_package_name
+unset _colcon_prefix_zsh_source_script
+unset _colcon_ordered_packages
+
+unset COLCON_CURRENT_PREFIX
 unset _colcon_prefix_zsh_COLCON_CURRENT_PREFIX

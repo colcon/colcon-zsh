@@ -18,13 +18,11 @@ class ZShell(ShellExtensionPoint):
 
     def __init__(self):  # noqa: D107
         super().__init__()
-        satisfies_version(ShellExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
+        satisfies_version(ShellExtensionPoint.EXTENSION_POINT_VERSION, '^2.0')
         if sys.platform == 'win32' and not use_all_shell_extensions:
             raise SkipExtensionException('Not used on Windows systems')
 
-    def create_prefix_script(
-        self, prefix_path, pkg_names, merge_install
-    ):  # noqa: D102
+    def create_prefix_script(self, prefix_path, merge_install):  # noqa: D102
         prefix_env_path = prefix_path / 'local_setup.zsh'
         logger.info(
             "Creating prefix script '{prefix_env_path}'".format_map(locals()))
@@ -32,10 +30,11 @@ class ZShell(ShellExtensionPoint):
             Path(__file__).parent / 'template' / 'prefix.zsh.em',
             prefix_env_path,
             {
-                'pkg_names': pkg_names,
+                'python_executable': sys.executable,
                 'merge_install': merge_install,
                 'package_script_no_ext': 'package',
             })
+        # no need to copy prefix_util.py explicitly since zsh relies on sh
 
         prefix_chain_env_path = prefix_path / 'setup.zsh'
         logger.info(
