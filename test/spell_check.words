@@ -1,3 +1,10 @@
+apache
+colcon
+iterdir
 noqa
-pragma
-zsh
+pathlib
+plugin
+pytest
+scspell
+setuptools
+thomas
