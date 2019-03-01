@@ -6,7 +6,7 @@ import sys
 
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.plugin_system import SkipExtensionException
-from colcon_core.shell import get_colcon_prefix_path
+from colcon_core.prefix_path import get_chained_prefix_path
 from colcon_core.shell import logger
 from colcon_core.shell import ShellExtensionPoint
 from colcon_core.shell import use_all_shell_extensions
@@ -44,7 +44,8 @@ class ZShell(ShellExtensionPoint):
             Path(__file__).parent / 'template' / 'prefix_chain.zsh.em',
             prefix_chain_env_path,
             {
-                'colcon_prefix_path': get_colcon_prefix_path(skip=prefix_path),
+                'chained_prefix_path': get_chained_prefix_path(
+                    skip=prefix_path),
                 'prefix_script_no_ext': 'local_setup',
             })
 
