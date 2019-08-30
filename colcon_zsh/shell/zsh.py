@@ -18,7 +18,7 @@ class ZShell(ShellExtensionPoint):
 
     def __init__(self):  # noqa: D107
         super().__init__()
-        satisfies_version(ShellExtensionPoint.EXTENSION_POINT_VERSION, '^2.0')
+        satisfies_version(ShellExtensionPoint.EXTENSION_POINT_VERSION, '^2.1')
         if sys.platform == 'win32' and not use_all_shell_extensions:
             raise SkipExtensionException('Not used on Windows systems')
 

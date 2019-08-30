@@ -92,7 +92,7 @@ fi
 
 # function to source another script with conditional trace output
 # first argument: the path of the script
-_colcon_prefix_zsh_source_script() {
+_colcon_prefix_sh_source_script() {
   if [ -f "$1" ]; then
     if [ -n "$COLCON_TRACE" ]; then
       echo ". \"$1\""
@@ -103,25 +103,23 @@ _colcon_prefix_zsh_source_script() {
   fi
 }
 
-# get all packages in topological order
-_colcon_ordered_packages="$(@
-$_colcon_python_executable "$_colcon_prefix_zsh_COLCON_CURRENT_PREFIX/_local_setup_util.py"@
+# get all commands in topological order
+_colcon_ordered_commands="$(@
+$_colcon_python_executable "$_colcon_prefix_zsh_COLCON_CURRENT_PREFIX/_local_setup_util_sh.py" sh zsh@
 @[if merge_install]@
  --merged-install@
 @[end if]@
 )"
 unset _colcon_python_executable
-_colcon_prefix_zsh_convert_to_array _colcon_ordered_packages
+if [ -n "$COLCON_TRACE" ]; then
+  echo "Execute generated script:"
+  echo "<<<"
+  echo "${_colcon_ordered_commands}"
+  echo ">>>"
+fi
+eval "${_colcon_ordered_commands}"
+unset _colcon_ordered_commands
 
-# source package specific scripts in topological order
-for _colcon_package_name in $_colcon_ordered_packages; do
-  # setting COLCON_CURRENT_PREFIX avoids relying on the build time prefix of the sourced script
-  COLCON_CURRENT_PREFIX="${_colcon_prefix_zsh_COLCON_CURRENT_PREFIX}@('' if merge_install else '/${_colcon_package_name}')"
-  _colcon_prefix_zsh_source_script "$COLCON_CURRENT_PREFIX/share/${_colcon_package_name}/@(package_script_no_ext).zsh"
-done
-unset _colcon_package_name
-unset _colcon_prefix_zsh_source_script
-unset _colcon_ordered_packages
+unset _colcon_prefix_sh_source_script
 
-unset COLCON_CURRENT_PREFIX
 unset _colcon_prefix_zsh_COLCON_CURRENT_PREFIX
