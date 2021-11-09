@@ -49,9 +49,9 @@ class ZShell(ShellExtensionPoint):
                 'prefix_script_no_ext': 'local_setup',
             })
 
-    def create_package_script(
+    def create_package_script(  # noqa: D102
         self, prefix_path, pkg_name, hooks
-    ):  # noqa: D102
+    ):
         pkg_env_path = prefix_path / 'share' / pkg_name / 'package.zsh'
         logger.info(
             "Creating package script '{pkg_env_path}'".format_map(locals()))
