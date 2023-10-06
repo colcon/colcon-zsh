@@ -18,7 +18,7 @@ class ZShell(ShellExtensionPoint):
 
     def __init__(self):  # noqa: D107
         super().__init__()
-        satisfies_version(ShellExtensionPoint.EXTENSION_POINT_VERSION, '^2.1')
+        satisfies_version(ShellExtensionPoint.EXTENSION_POINT_VERSION, '^2.2')
         if sys.platform == 'win32' and not use_all_shell_extensions:
             raise SkipExtensionException('Not used on Windows systems')
 
@@ -49,6 +49,11 @@ class ZShell(ShellExtensionPoint):
                 'prefix_script_no_ext': 'local_setup',
             })
 
+        return [
+            prefix_env_path,
+            prefix_chain_env_path,
+        ]
+
     def create_package_script(  # noqa: D102
         self, prefix_path, pkg_name, hooks
     ):
@@ -64,3 +69,4 @@ class ZShell(ShellExtensionPoint):
                     lambda hook: str(hook[0]).endswith('.zsh'), hooks)),
                 'package_script_no_ext': 'package',
             })
+        return [pkg_env_path]
