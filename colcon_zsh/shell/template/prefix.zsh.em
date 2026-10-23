@@ -4,7 +4,7 @@
 # prefix path.
 
 # a zsh script is able to determine its own path if necessary
-if [ -z "$COLCON_CURRENT_PREFIX" ]; then
+if [ -z "${COLCON_CURRENT_PREFIX:-}" ]; then
   _colcon_prefix_zsh_COLCON_CURRENT_PREFIX="$(builtin cd -q "`dirname "${(%):-%N}"`" > /dev/null && pwd)"
 else
   _colcon_prefix_zsh_COLCON_CURRENT_PREFIX="$COLCON_CURRENT_PREFIX"
@@ -31,7 +31,7 @@ _colcon_prefix_zsh_prepend_unique_value() {
   _value="$2"
 
   # get values from variable
-  eval _values=\"\$$_listname\"
+  eval _values=\"\${$_listname:-}\"
   # backup the field separator
   _colcon_prefix_zsh_prepend_unique_value_IFS="$IFS"
   IFS=":"
@@ -56,7 +56,7 @@ _colcon_prefix_zsh_prepend_unique_value() {
   done
   unset _item
   if [ -z "$_contained_value" ]; then
-    if [ -n "$COLCON_TRACE" ]; then
+    if [ -n "${COLCON_TRACE:-}" ]; then
       if [ "$_all_values" = "$_value" ]; then
         echo "export $_listname=$_value"
       else
@@ -83,7 +83,7 @@ unset _colcon_prefix_zsh_prepend_unique_value
 unset _colcon_prefix_zsh_convert_to_array
 
 # check environment variable for custom Python executable
-if [ -n "$COLCON_PYTHON_EXECUTABLE" ]; then
+if [ -n "${COLCON_PYTHON_EXECUTABLE:-}" ]; then
   if [ ! -f "$COLCON_PYTHON_EXECUTABLE" ]; then
     echo "error: COLCON_PYTHON_EXECUTABLE '$COLCON_PYTHON_EXECUTABLE' doesn't exist"
     return 1
@@ -106,7 +106,7 @@ fi
 # first argument: the path of the script
 _colcon_prefix_sh_source_script() {
   if [ -f "$1" ]; then
-    if [ -n "$COLCON_TRACE" ]; then
+    if [ -n "${COLCON_TRACE:-}" ]; then
       echo "# . \"$1\""
     fi
     . "$1"
@@ -123,7 +123,7 @@ $_colcon_python_executable "$_colcon_prefix_zsh_COLCON_CURRENT_PREFIX/_local_set
 @[end if]@
 )"
 unset _colcon_python_executable
-if [ -n "$COLCON_TRACE" ]; then
+if [ -n "${COLCON_TRACE:-}" ]; then
   echo "$(declare -f _colcon_prefix_sh_source_script)"
   echo "# Execute generated script:"
   echo "# <<<"

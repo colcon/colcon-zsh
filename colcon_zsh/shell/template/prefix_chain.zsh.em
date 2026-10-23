@@ -8,7 +8,7 @@
 # first argument: the path of the script
 _colcon_prefix_chain_zsh_source_script() {
   if [ -f "$1" ]; then
-    if [ -n "$COLCON_TRACE" ]; then
+    if [ -n "${COLCON_TRACE:-}" ]; then
       echo "# . \"$1\""
     fi
     . "$1"
